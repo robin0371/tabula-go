@@ -1,6 +1,10 @@
 package tabula
 
-import "testing"
+import (
+	"os"
+	"path"
+	"testing"
+)
 
 func TestGetCmdOptions(t *testing.T) {
 	options := TabulaOptions{
@@ -12,8 +16,9 @@ func TestGetCmdOptions(t *testing.T) {
 		Guess:   true,
 		Lattice: true,
 	}
+	dir, _ := os.Getwd()
 	expected_args := []string{
-		"-jar", tabula_jar,
+		"-jar", path.Join(dir, TabulaJar),
 		"-a", "1.1,2.2,3.3,4.4",
 		"-b", "/home/user/test",
 		"-c", "0.1,0.2,0.3,0.4",

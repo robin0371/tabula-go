@@ -3,11 +3,13 @@ package tabula
 import (
 	"log"
 	"os/exec"
+	"path"
+	"runtime"
 	"strings"
 )
 
-const tabula_version = "1.0.2"
-const tabula_jar = "tabula-" + tabula_version + "-jar-with-dependencies.jar"
+const TabulaVersion = "1.0.2"
+const TabulaJar = "tabula-" + TabulaVersion + "-jar-with-dependencies.jar"
 
 type TabulaOptions struct {
 	Area    []string // Portion of the page to analyze. Accepts top, left, bottom, right. Example: ["269.875" "12.75" "790.5" "561"]
@@ -21,7 +23,8 @@ type TabulaOptions struct {
 
 // Returns prepared array of command line options to run tabula
 func GetCmdOptions(options TabulaOptions) []string {
-	args := []string{"-jar", tabula_jar}
+	_, filename, _, _ := runtime.Caller(1)
+	args := []string{"-jar", path.Join(path.Dir(filename), TabulaJar)}
 
 	if len(options.Area) > 0 {
 		area := strings.Join(options.Area, ",")
@@ -52,11 +55,16 @@ func GetCmdOptions(options TabulaOptions) []string {
 }
 
 // Executes command for extract data using tabula
-func ExtractTableData(options TabulaOptions) {
-	args := GetCmdOptions(options)
-	cmd := exec.Command("java", args...)
-	err := cmd.Run()
+// by tabula options as struct
+func ExtractTableData(args TabulaOptions) {
+	options := GetCmdOptions(args)
+	cmd := exec.Command("java", options...)
+	log.Printf("Command: %s\n", strings.Join(cmd.Args, " "))
+
+	output, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Error: %s\nResult: %s", err, output)
+	} else {
+		log.Printf("Success\nResult: %s", output)
 	}
 }
