@@ -19,6 +19,7 @@ type TabulaOptions struct {
 	Pages   []string // Pages ["5", "6"]
 	Guess   bool     // Guess the portion of the page to analyze per page. Default true
 	Lattice bool     // Force PDF to be extracted using lattice-mode extraction. Default false
+	Path    string   // Path to target file
 }
 
 // Returns prepared array of command line options to run tabula
@@ -51,20 +52,27 @@ func GetCmdOptions(options TabulaOptions) []string {
 		args = append(args, "-l")
 	}
 
+	if len(options.Path) > 0 {
+		args = append(args, options.Path)
+	}
+
 	return args
 }
 
 // Executes command for extract data using tabula
 // by tabula options as struct
-func ExtractTableData(args TabulaOptions) {
+func ExtractTableData(args TabulaOptions) string {
 	options := GetCmdOptions(args)
 	cmd := exec.Command("java", options...)
 	log.Printf("Command: %s\n", strings.Join(cmd.Args, " "))
 
-	output, err := cmd.CombinedOutput()
+	output, err := cmd.Output()
+
 	if err != nil {
-		log.Printf("Error: %s\nResult: %s", err, output)
+		log.Printf("Error: %s\nResult: %s", err.Error(), output)
 	} else {
 		log.Printf("Success\nResult: %s", output)
 	}
+
+	return string(output)
 }
