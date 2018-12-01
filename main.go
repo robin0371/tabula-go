@@ -7,7 +7,8 @@ import (
 	"os/exec"
 	"path"
 	"strings"
-	tabula "tabula-go/lib"
+
+	tabula "github.com/robin0371/tabula-go/lib"
 )
 
 // CLI for extract data using tabula
